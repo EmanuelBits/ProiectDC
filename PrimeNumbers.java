@@ -47,6 +47,7 @@ final class Prime {
         if ((val == 0) || (val == 1)) return false;
         else if (val == 2) return true;
         else if (val % 2 == 0) return false;
+        else if ((val % 5 == 0) && (val != 5)) return false;
         else {
             for (long i = 3; i <= Math.sqrt(val); i+=2) {
                 if (val % i == 0) return false;
