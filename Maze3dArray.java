@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Maze3dArray {
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = "\u001B[0m";
 
     private static Maze createMaze(Scanner scanner) throws IOException {
@@ -36,12 +37,12 @@ public class Maze3dArray {
         }
         
         return new Maze(cube, dimension);
-    }    
+    }      
 
     private static long getMaxSize(ArrayList<Maze> cubes) {
         long maxSize = 0;
         for (Maze maze : cubes) {
-            long size = maze.getSize();
+            long size = maze.getDimension();
             if (size > maxSize) {
                 maxSize = size;
             }
@@ -60,31 +61,121 @@ public class Maze3dArray {
                     break; // End of file reached
                 }
                 cubes.add(maze);
+                // Print the path for testing
+                System.out.println(ANSI_YELLOW + "Path for Maze " + cubes.size() + ": " + ANSI_RESET + maze.getPath());
             }
             System.out.println(ANSI_GREEN + "Successfully read " + cubes.size() + " maze(s) from the file." + ANSI_RESET);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+    
         long maxSize = getMaxSize(cubes);
         System.out.println("Max size of maze: " + maxSize);
     }
+    
 }
 
 final class Maze {
     private final long[][][] cube;
-    private final long size;
+    private final int dimension;
+    private final ArrayList<PathNode> path;
 
-    public Maze(long[][][] cube, long size) {
+    public Maze(long[][][] cube, int dimension) {
         this.cube = cube;
-        this.size = size;
+        this.dimension = dimension;
+        this.path = generateRandomPath(this.dimension);
     }
+
+    private ArrayList<PathNode> generateRandomPath(int dimension) {
+        ArrayList<PathNode> randomPath = new ArrayList<>();
+        
+        boolean[][][] visitedCube = new boolean[dimension][dimension][dimension];
+        visitedCube[0][0][0] = true; // Mark the start position as visited
+        
+        int x = 0, y = 0, z = 0; // Start position
+        randomPath.add(new PathNode(x, y, z));
+        
+        while (x != dimension - 1 || y != dimension - 1 || z != dimension - 1) {
+            ArrayList<Integer> directions = new ArrayList<>();
+            
+            // Check available directions
+            if (x + 1 < dimension && !visitedCube[x + 1][y][z]) directions.add(0); // UP
+            if (x - 1 >= 0 && !visitedCube[x - 1][y][z]) directions.add(1); // DOWN
+            if (y + 1 < dimension && !visitedCube[x][y + 1][z]) directions.add(2); // AHEAD
+            if (y - 1 >= 0 && !visitedCube[x][y - 1][z]) directions.add(3); // BACK
+            if (z + 1 < dimension && !visitedCube[x][y][z + 1]) directions.add(4); // LEFT
+            if (z - 1 >= 0 && !visitedCube[x][y][z - 1]) directions.add(5); // RIGHT
+            
+            if (directions.isEmpty()) {
+                // If no available directions, backtrack
+                PathNode lastNode = randomPath.remove(randomPath.size() - 1);
+                x = lastNode.getX();
+                y = lastNode.getY();
+                z = lastNode.getZ();
+            } else {
+                // Choose a random direction from available directions
+                int randIndex = (int) (Math.random() * directions.size());
+                int direction = directions.get(randIndex);
+                
+                // Move to the new position
+                switch (direction) {
+                    case 0: x++; break; // UP
+                    case 1: x--; break; // DOWN
+                    case 2: y++; break; // AHEAD
+                    case 3: y--; break; // BACK
+                    case 4: z++; break; // LEFT
+                    case 5: z--; break; // RIGHT
+                }
+                
+                // Mark the new position as visited
+                visitedCube[x][y][z] = true;
+                
+                // Add the new position to the path
+                randomPath.add(new PathNode(x, y, z));
+            }
+        }
+        return randomPath;
+    }
+    
 
     public long[][][] getCube() {
         return cube;
     }
 
-    public long getSize() {
-        return size;
+    public int getDimension() {
+        return dimension;
+    }
+
+    public ArrayList<PathNode> getPath() {
+        return path;
+    }
+}
+
+final class PathNode {
+    private final int x;
+    private final int y;
+    private final int z;
+    
+    public PathNode(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public int getX() {
+        return x;
+    }
+    
+    public int getY() {
+        return y;
+    }
+    
+    public int getZ() {
+        return z;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ", " + z + ")";
     }
 }
