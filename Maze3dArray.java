@@ -110,7 +110,7 @@ public class Maze3dArray {
         FileWriter fileWriter = new FileWriter(mazesPath);          // Create a FileWriter object to write to the file
         PrintWriter printWriter = new PrintWriter(fileWriter);      // Create a PrintWriter object to write formatted text to the FileWriter
 
-        ArrayList<Maze> cubes = new ArrayList<>(10);
+        ArrayList<Maze> cubes = new ArrayList<>(1000000);
         
         try (Scanner scanner = new Scanner(new File(mazesFile))) {
             while (true) {
