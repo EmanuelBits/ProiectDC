@@ -59,6 +59,7 @@ public class Maze3dArray {
         long maxNode = Long.MIN_VALUE;
         long pathLength = 0;
         long pathSum = 0;
+        boolean sumExceededMaxValue = false;
     
         printWriter.println("\tDimension for Maze " + cubes.size() + " : "+ dim);
 
@@ -84,17 +85,24 @@ public class Maze3dArray {
                 maxNode = auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];
             }
             pathLength++;
-            pathSum += auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];
+            if (sumExceededMaxValue == false) {
+                if ((pathSum + auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()]) > Long.MAX_VALUE) {
+                    pathSum = Long.MAX_VALUE;
+                    sumExceededMaxValue = true;
+                } else {
+                    pathSum += auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];   
+                }
+            }
         }
 
         printWriter.println();
         printWriter.println("Minimum value from the path : " + minNode);
         printWriter.println("Maximum value from the path : " + maxNode);
         printWriter.println("Path Length : " + pathLength);
-        printWriter.println("Path Sum : " + pathSum);
+        printWriter.println("Path Sum : " + pathSum);     if (sumExceededMaxValue) printWriter.println("\t\t\tSum exceded Long.MAX_VALUE!");
         printWriter.println();
     }
-    
+
     public static void main(String[] args) throws IOException {
         String mazesFile = "mazes.txt";
         String mazesPath = "paths.txt";
