@@ -1,5 +1,7 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -25,7 +27,7 @@ public class Maze3dArray {
                     if (!scanner.hasNextLong()) {
                         throw new IOException(ANSI_RED + "Incomplete maze. Expected " + dimension + " elements on each line." + ANSI_RESET);
                     }
-                    cube[z][y][x] = scanner.nextLong();
+                    cube[x][y][z] = scanner.nextLong();
                 }
                 totalLinesRead++;
             }
@@ -50,21 +52,73 @@ public class Maze3dArray {
         return maxSize;
     }
 
-    public static void main(String[] args) {
-        String filePath = "mazes.txt";
+    private static void storeMazesInfo(ArrayList<Maze> cubes, Maze maze, PrintWriter printWriter) throws IOException {
+        long[][][] auxCube = maze.getCube();
+        int dim = maze.getDimension();
+        long minNode = Long.MAX_VALUE;
+        long maxNode = Long.MIN_VALUE;
+        long pathLength = 0;
+        long pathSum = 0;
+    
+        printWriter.println("\tDimension for Maze " + cubes.size() + " : "+ dim);
+
+        for (int y = 0; y < dim; y++) {
+            for (int z = 0; z < dim; z++) {
+                for (int x = 0; x < dim; x++) {
+                    printWriter.print(auxCube[x][y][z] + " ");
+                }
+                printWriter.print("\t");
+            }
+            printWriter.println();
+        }
+    
+        printWriter.println("Path for Maze " + cubes.size() + ": "+ maze.getPath());
+        printWriter.print("Path for Maze " + cubes.size() + " (values) : ");
+    
+        for (PathNode pathNode : maze.getPath()) {
+            printWriter.print(" " + auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()]);
+    
+            if (auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()] < minNode) {
+                minNode = auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];
+            } else if (auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()] > maxNode) {
+                maxNode = auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];
+            }
+            pathLength++;
+            pathSum += auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];
+        }
+
+        printWriter.println();
+        printWriter.println("Minimum value from the path : " + minNode);
+        printWriter.println("Maximum value from the path : " + maxNode);
+        printWriter.println("Path Length : " + pathLength);
+        printWriter.println("Path Sum : " + pathSum);
+        printWriter.println();
+    }
+    
+    public static void main(String[] args) throws IOException {
+        String mazesFile = "mazes.txt";
+        String mazesPath = "paths.txt";
+    
+        FileWriter fileWriter = new FileWriter(mazesPath);          // Create a FileWriter object to write to the file
+        PrintWriter printWriter = new PrintWriter(fileWriter);      // Create a PrintWriter object to write formatted text to the FileWriter
+
         ArrayList<Maze> cubes = new ArrayList<>(10);
         
-        try (Scanner scanner = new Scanner(new File(filePath))) {
+        try (Scanner scanner = new Scanner(new File(mazesFile))) {
             while (true) {
                 Maze maze = createMaze(scanner);
                 if (maze == null) {
                     break; // End of file reached
                 }
                 cubes.add(maze);
-                // Print the path for testing
+
                 System.out.println(ANSI_YELLOW + "Path for Maze " + cubes.size() + ": " + ANSI_RESET + maze.getPath());
+                storeMazesInfo(cubes, maze, printWriter);
             }
-            System.out.println(ANSI_GREEN + "Successfully read " + cubes.size() + " maze(s) from the file." + ANSI_RESET);
+            printWriter.close();
+            fileWriter.close();
+
+            System.out.println(ANSI_GREEN + "Successfully read " + cubes.size() + " maze(s) from the file and written to the file ~paths.txt~." + ANSI_RESET);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -137,7 +191,6 @@ final class Maze {
         return randomPath;
     }
     
-
     public long[][][] getCube() {
         return cube;
     }
