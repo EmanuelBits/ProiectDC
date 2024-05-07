@@ -11,6 +11,62 @@ public class Maze3dArray {
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = "\u001B[0m";
 
+    private static ArrayList<String> paths;
+    private static long maxMazeSize;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // public Maze3dArray() {
+    //     String mazesFile = "mazes.txt";
+    //     String mazesPath = "paths.txt";
+
+    //     FileWriter fileWriter;
+    //     PrintWriter printWriter;
+
+    //     try {
+    //         fileWriter = new FileWriter(mazesPath); // Create a FileWriter object to write to the file
+    //         printWriter = new PrintWriter(fileWriter); // Create a PrintWriter object to write formatted text to the FileWriter
+
+    //         ArrayList<Maze> cubes = new ArrayList<>(1000000);
+    //         paths = new ArrayList<>(); // Initialize the paths ArrayList
+
+    //         try (Scanner scanner = new Scanner(new File(mazesFile))) {
+    //             while (true) {
+    //                 Maze maze = createMaze(scanner);
+    //                 if (maze == null) {
+    //                     break; // End of file reached
+    //                 }
+    //                 cubes.add(maze);
+
+    //                 // Store the path in the ArrayList paths
+    //                 StringBuilder pathString = new StringBuilder();
+    //                 for (PathNode pathNode : maze.getPath()) {
+    //                     pathString.append("(")
+    //                               .append(pathNode.getX())
+    //                               .append(", ")
+    //                               .append(pathNode.getY())
+    //                               .append(", ")
+    //                               .append(pathNode.getZ())
+    //                               .append(") ");
+    //                 }
+    //                 paths.add(pathString.toString());
+
+    //                 // System.out.println(ANSI_YELLOW + "Path for Maze " + cubes.size() + ": " + ANSI_RESET + maze.getPath());
+    //                 storeMazesInfo(cubes, maze, printWriter);
+    //             }
+    //             printWriter.close();
+    //             fileWriter.close();
+
+    //             // System.out.println(ANSI_GREEN + "Successfully read " + cubes.size() + " maze(s) from the file and written to the file ~paths.txt~." + ANSI_RESET);
+    //         } catch (IOException e) {
+    //             e.printStackTrace();
+    //         }
+    //         maxMazeSize = getMaxSize(cubes);
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private static Maze createMaze(Scanner scanner) throws IOException {
         if (!scanner.hasNextInt()) {
             return null; // End of file reached
@@ -103,6 +159,14 @@ public class Maze3dArray {
         printWriter.println();
     }
 
+    public static ArrayList<String> getPaths() {
+        return paths;
+    }
+
+    public static long getMaxMazeSize() {
+        return maxMazeSize;
+    }
+
     public static void main(String[] args) throws IOException {
         String mazesFile = "mazes.txt";
         String mazesPath = "paths.txt";
@@ -134,7 +198,6 @@ public class Maze3dArray {
         long maxSize = getMaxSize(cubes);
         System.out.println("Max size of maze: " + maxSize);
     }
-    
 }
 
 final class Maze {
