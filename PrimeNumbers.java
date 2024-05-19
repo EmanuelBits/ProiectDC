@@ -1,9 +1,11 @@
 public class PrimeNumbers {
     public static void main(String[] args) {
         try {
-            Prime p1 = new Prime(5);
-            System.out.println("Value : " + p1.getValue());
-            System.out.println("Index : " + p1.getIndex());
+            Prime prime = new Prime(1299709);
+            System.out.println("Prime Value: " + prime.getValue());
+            System.out.println("Prime Index: " + prime.getIndex());
+            System.out.println("Benchmark Score: " + prime.getScore());
+            System.out.println("Computation Time: " + prime.getComputationTime() + " ms");
         } catch (IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }
@@ -12,36 +14,51 @@ public class PrimeNumbers {
 
 final class Prime {
     private final long value;
-    private final long Index;
+    private final long index;
+    private final long score;
+    private final double computationTime;
 
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_RESET = "\u001B[0m";
 
     public Prime(long value) throws IllegalArgumentException {
-        if (isPrime(value)){
+        long startTime = System.nanoTime();  // Record start time
+
+        if (isPrime(value)) {
             this.value = value;
-            this.Index = findIndex(value);
+            this.index = findIndex(value);
         } else {
             throw new IllegalArgumentException(ANSI_RED + "The number is NOT prime!" + ANSI_RESET);
         }
-    }
-    public Prime(long indexOrValue, boolean indexOrFind) {
-        if (indexOrFind == true) {
-            if (indexOrValue < 1) throw new IllegalArgumentException(ANSI_RED + "Value is smaller than 1!" + ANSI_RESET);
-            else {
-                this.value = findPrime(indexOrValue);
-                this.Index = indexOrValue;
-            }
-        } else {
-            if (!isPrime(indexOrValue)){
-                throw new IllegalArgumentException(ANSI_RED + "The number is NOT prime!" + ANSI_RESET);
-            } else {
-                this.value = indexOrValue;   
-                this.Index = findIndex(indexOrValue);
-            }
-        }
+
+        long endTime = System.nanoTime();  // Record end time
+        this.computationTime = (endTime - startTime) / 1_000_000.0;  // Calculate and store computation time in milliseconds
+        this.score = calculateBenchmarkScore();  // Calculate score when a prime is created
     }
 
+    public Prime(long indexOrValue, boolean indexOrFind) {
+        long startTime = System.nanoTime();  // Record start time
+
+        if (indexOrFind) {
+            if (indexOrValue < 1) {
+                throw new IllegalArgumentException(ANSI_RED + "Value is smaller than 1!" + ANSI_RESET);
+            } else {
+                this.value = findPrime(indexOrValue);
+                this.index = indexOrValue;
+            }
+        } else {
+            if (!isPrime(indexOrValue)) {
+                throw new IllegalArgumentException(ANSI_RED + "The number is NOT prime!" + ANSI_RESET);
+            } else {
+                this.value = indexOrValue;
+                this.index = findIndex(indexOrValue);
+            }
+        }
+
+        long endTime = System.nanoTime();  // Record end time
+        this.computationTime = (endTime - startTime) / 1_000_000.0;  // Calculate and store computation time in milliseconds
+        this.score = calculateBenchmarkScore();  // Calculate score when a prime is created
+    }
 
     private static boolean isPrime(long val) {
         if ((val == 0) || (val == 1)) return false;
@@ -92,10 +109,52 @@ final class Prime {
         return -1;
     }
 
+    private long calculateBenchmarkScore() {
+        double weightValue = 0.3;
+        double weightIndex = 0.3;
+        double weightTime = 0.4;
+    
+        // Apply piecewise scaling
+        double valueComponent = weightValue * piecewiseScale(this.value);
+        double indexComponent = weightIndex * piecewiseScale(this.index);
+        double timeComponent = weightTime * (this.computationTime + 1);
+    
+        // Adjusting the scale factor to decrease the score
+        double scaleFactor = 1000;  // Smaller scale factor for a smaller score
+    
+        // Final score calculation, ensuring the result is of type long
+        double score = scaleFactor * (valueComponent + indexComponent) / timeComponent;
+    
+        // Return the score as a long type
+        return (long) Math.round(score);
+    }
+    
+    // Helper method for piecewise scaling
+    private double piecewiseScale(long number) {
+        if (number < 10) {
+            return number;
+        } else if (number < 100) {
+            return Math.log(number) * 10;
+        } else if (number < 1000) {
+            return Math.log(number) * 20;
+        } else {
+            return Math.log(number) * 50;
+        }
+    }    
+
     public long getValue() {
         return this.value;
     }
+
     public long getIndex() {
-        return this.Index;
+        return this.index;
+    }
+
+    public long getScore() {
+        return this.score;
+    }
+
+    public double getComputationTime() {
+        return this.computationTime;
     }
 }
