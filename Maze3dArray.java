@@ -6,211 +6,247 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Maze3dArray {
-    private static final String ANSI_GREEN = "\u001B[32m";
+    public static void main(String[] args) throws IOException {
+        Maze m1 = new Maze(32);
+
+        System.out.println(m1.getDimension());
+        System.out.println(m1.getPath());
+        System.out.println("Minimum Read Time: " + m1.getMinReadTime() / 1_000_000.0);
+        System.out.println("Maximum Read Time: " + m1.getMaxReadTime() / 1_000_000.0);
+        System.out.println("Minimum Write Time: " + m1.getMinWriteTime() / 1_000_000.0);
+        System.out.println("Maximum Write Time: " + m1.getMaxWriteTime() / 1_000_000.0);
+        System.out.println("Average Read Time: " + m1.getAvgReadTime() / 1_000_000.0);
+        System.out.println("Average Write Time: " + m1.getAvgWriteTime() / 1_000_000.0);
+
+        System.out.println("File Length: " + m1.getMazeFileLength());
+
+        System.out.println("Read Score: " + m1.getReadScore());
+        System.out.println("Write Score: " + m1.getWriteScore());
+        System.out.println("Overall Score: " + m1.getOverallScore());
+    }
+}
+
+final class Maze {
     private static final String ANSI_RED = "\u001B[31m";
-    private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = "\u001B[0m";
 
-    private static ArrayList<String> paths;
-    private static long maxMazeSize;
+    private final long[][][] cube;
+    private final int dimension;
+    private final ArrayList<PathNode> path;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // public Maze3dArray() {
-    //     String mazesFile = "mazes.txt";
-    //     String mazesPath = "paths.txt";
+    private final long mazeFileLength;
 
-    //     FileWriter fileWriter;
-    //     PrintWriter printWriter;
+    private double[] readingTimes;
+    private double[] writingTimes;
+    private final double minReadTime;
+    private final double maxReadTime;
+    private final double avgReadTime;
+    private final double minWriteTime;
+    private final double maxWriteTime;
+    private final double avgWriteTime;
 
-    //     try {
-    //         fileWriter = new FileWriter(mazesPath); // Create a FileWriter object to write to the file
-    //         printWriter = new PrintWriter(fileWriter); // Create a PrintWriter object to write formatted text to the FileWriter
+    private final long readScore;
+    private final long writeScore;
+    private final long overallScore;
 
-    //         ArrayList<Maze> cubes = new ArrayList<>(1000000);
-    //         paths = new ArrayList<>(); // Initialize the paths ArrayList
+    private final int readTimesFor_4_8_16_32_64 = 16;
+    private final int readTimesFor_128 = 5;
+    private final int readTimesFor_256 = 4;
+    private final int writeTimesForAll = 7;
 
-    //         try (Scanner scanner = new Scanner(new File(mazesFile))) {
-    //             while (true) {
-    //                 Maze maze = createMaze(scanner);
-    //                 if (maze == null) {
-    //                     break; // End of file reached
-    //                 }
-    //                 cubes.add(maze);
+    public Maze(int dimension) throws IOException {
+        this.cube = createCube(dimension);
+        this.dimension = dimension;
+        this.path = generateRandomPath(this.dimension);
+        writeCube();
+        this.minReadTime = storeMinReadingTime();
+        this.maxReadTime = storeMaxReadingTime();
+        this.minWriteTime = storeMinWritingTime();
+        this.maxWriteTime = storeMaxWritingTime();
+        this.avgReadTime = storeAvgReadingTime();
+        this.avgWriteTime = storeAvgWritingTime();
 
-    //                 // Store the path in the ArrayList paths
-    //                 StringBuilder pathString = new StringBuilder();
-    //                 for (PathNode pathNode : maze.getPath()) {
-    //                     pathString.append("(")
-    //                               .append(pathNode.getX())
-    //                               .append(", ")
-    //                               .append(pathNode.getY())
-    //                               .append(", ")
-    //                               .append(pathNode.getZ())
-    //                               .append(") ");
-    //                 }
-    //                 paths.add(pathString.toString());
+        this.mazeFileLength = getMazeFileLength(this.dimension);
 
-    //                 // System.out.println(ANSI_YELLOW + "Path for Maze " + cubes.size() + ": " + ANSI_RESET + maze.getPath());
-    //                 storeMazesInfo(cubes, maze, printWriter);
-    //             }
-    //             printWriter.close();
-    //             fileWriter.close();
-
-    //             // System.out.println(ANSI_GREEN + "Successfully read " + cubes.size() + " maze(s) from the file and written to the file ~paths.txt~." + ANSI_RESET);
-    //         } catch (IOException e) {
-    //             e.printStackTrace();
-    //         }
-    //         maxMazeSize = getMaxSize(cubes);
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private static Maze createMaze(Scanner scanner) throws IOException {
-        if (!scanner.hasNextInt()) {
-            return null; // End of file reached
-        }
-        
-        int dimension = scanner.nextInt();
-        long[][][] cube = new long[dimension][dimension][dimension];
-        
-        int totalLinesRead = 0;
-        
-        for (int z = 0; z < dimension; z++) {
-            for (int y = 0; y < dimension; y++) {
-                for (int x = 0; x < dimension; x++) {
-                    if (!scanner.hasNextLong()) {
-                        throw new IOException(ANSI_RED + "Incomplete maze. Expected " + dimension + " elements on each line." + ANSI_RESET);
-                    }
-                    cube[x][y][z] = scanner.nextLong();
-                }
-                totalLinesRead++;
-            }
-        }
-        
-        int expectedTotalLines = dimension * dimension;
-        if (totalLinesRead != expectedTotalLines) {
-            throw new IOException(ANSI_RED + "Incomplete maze. Expected " + expectedTotalLines + " lines for the entire maze." + ANSI_RESET);
-        }
-        
-        return new Maze(cube, dimension);
-    }      
-
-    private static long getMaxSize(ArrayList<Maze> cubes) {
-        long maxSize = 0;
-        for (Maze maze : cubes) {
-            long size = maze.getDimension();
-            if (size > maxSize) {
-                maxSize = size;
-            }
-        }
-        return maxSize;
+        // Calculate benchmark scores
+        this.readScore = calculateBenchmarkReadScore(this.dimension);
+        this.writeScore = calculateBenchmarkWriteScore();
+        this.overallScore = calculateOverallBenchmarkScore();
     }
 
-    private static void storeMazesInfo(ArrayList<Maze> cubes, Maze maze, PrintWriter printWriter) throws IOException {
-        long[][][] auxCube = maze.getCube();
-        int dim = maze.getDimension();
+    private long[][][] createCube(int dim) throws IOException {
+        long[][][] readingCube = new long[dim][dim][dim];
+
+        if (dim != 4 && dim != 8 && dim != 16 && dim != 32 && dim != 64 && dim != 128 && dim != 256) {
+            throw new IllegalArgumentException(ANSI_RED + "Invalid maze dimension value : " + dim + ANSI_RESET);
+        } else {
+            switch (dim) {
+                case 4:
+                    readingCube = readMultipleTimes(readTimesFor_4_8_16_32_64, dim, MazesFiles.getM4());
+                    break;
+                case 8:
+                    readingCube = readMultipleTimes(readTimesFor_4_8_16_32_64, dim, MazesFiles.getM8());
+                    break;
+                case 16:
+                    readingCube = readMultipleTimes(readTimesFor_4_8_16_32_64, dim, MazesFiles.getM16());
+                    break;
+                case 32:
+                    readingCube = readMultipleTimes(readTimesFor_4_8_16_32_64, dim, MazesFiles.getM32());
+                    break;
+                case 64:
+                    readingCube = readMultipleTimes(readTimesFor_4_8_16_32_64, dim, MazesFiles.getM64());
+                    break;
+                case 128:
+                    readingCube = readMultipleTimes(readTimesFor_128, dim, MazesFiles.getM128());
+                    break;
+                case 256:
+                    readingCube = readMultipleTimes(readTimesFor_256, dim, MazesFiles.getM256());
+                    break;
+                default:
+                    throw new IllegalArgumentException(ANSI_RED + "Invalid maze dimension value : " + dim + ANSI_RESET);
+            }
+            
+        }
+        return readingCube;
+    }
+
+    private long[][][] readMultipleTimes(int readTimes, int dim, String file) throws IOException{
+        long[][][] readingCube = new long[dim][dim][dim];
+        this.readingTimes = new double[readTimes];
+
+        for (int i = 0; i < readTimes; i++) {
+            long startTime = System.nanoTime();
+            readingCube = readCube(dim, file);
+            long endTime = System.nanoTime();
+            this.readingTimes[i] = (endTime - startTime);
+        }
+        return readingCube;
+    }
+
+    private long[][][] readCube(int dim, String filePath) throws IOException {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new IOException(ANSI_RED + "File not found: " + filePath + ANSI_RESET);
+        }
+
+        Scanner scanner = null;
+    
+        try {
+            scanner = new Scanner(file);
+            if (!scanner.hasNextInt()) {
+                throw new IOException(ANSI_RED + "No cube dimension found in the file." + ANSI_RESET);
+            }
+    
+            int cubeDimension = scanner.nextInt();
+            if (cubeDimension != dim) {
+                throw new IOException(ANSI_RED + "Invalid cube parameter (dim) in readCube() method: " + dim + ANSI_RESET);
+            }
+    
+            long[][][] readingCube = new long[cubeDimension][cubeDimension][cubeDimension];
+            int totalLinesRead = 0;
+    
+            for (int z = 0; z < cubeDimension; z++) {
+                for (int y = 0; y < cubeDimension; y++) {
+                    for (int x = 0; x < cubeDimension; x++) {
+                        if (!scanner.hasNextLong()) {
+                            throw new IOException(ANSI_RED + "Incomplete cube. Expected " + (cubeDimension * cubeDimension * cubeDimension) + " elements." + ANSI_RESET);
+                        }
+                        readingCube[x][y][z] = scanner.nextLong();
+                    }
+                    totalLinesRead++;
+                }
+            }
+    
+            int expectedTotalLines = cubeDimension * cubeDimension;
+            if (totalLinesRead != expectedTotalLines) {
+                throw new IOException(ANSI_RED + "Incomplete cube. Expected " + expectedTotalLines + " (" + cubeDimension + " * " + cubeDimension + ") lines." + ANSI_RESET);
+            }
+    
+            return readingCube;
+        } catch (IOException e) {
+            throw new IOException(ANSI_RED + "Error reading file: " + filePath + ANSI_RESET, e);
+        } catch (IllegalArgumentException e) {
+            throw e; // Rethrow the exception after logging if necessary
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
+        }
+    }
+    
+    private void writeCube() throws IOException {
+        this.writeMultipleTimes(MazesFiles.getMazePath());
+    }
+    
+    private void writeMultipleTimes(String file) throws IOException {
+        this.writingTimes = new double[this.writeTimesForAll];
+        for (int i = 0; i < this.writeTimesForAll; i++) {
+            long startTime = System.nanoTime(); 
+            this.fprintMazeInfo(file);
+            long endTime = System.nanoTime();
+            this.writingTimes[i] = (endTime - startTime);
+        }
+    }
+    
+    private void fprintMazeInfo(String file) throws IOException {
         long minNode = Long.MAX_VALUE;
         long maxNode = Long.MIN_VALUE;
         long pathLength = 0;
         long pathSum = 0;
         boolean sumExceededMaxValue = false;
     
-        printWriter.println("\tDimension for Maze " + cubes.size() + " : "+ dim);
-
-        for (int y = 0; y < dim; y++) {
-            for (int z = 0; z < dim; z++) {
-                for (int x = 0; x < dim; x++) {
-                    printWriter.print(auxCube[x][y][z] + " ");
+        // Use try-with-resources to ensure the resources are closed properly
+        try (FileWriter fileWriter = new FileWriter(file);  // Overwrites the file
+             PrintWriter printWriter = new PrintWriter(fileWriter)) {
+            
+            printWriter.println("\tMaze dimension : " + this.dimension);
+    
+            for (int y = 0; y < this.dimension; y++) {
+                for (int z = 0; z < this.dimension; z++) {
+                    for (int x = 0; x < this.dimension; x++) {
+                        printWriter.print(this.cube[x][y][z] + " ");
+                    }
+                    printWriter.print("\t");
                 }
-                printWriter.print("\t");
+                printWriter.println();
             }
+    
+            printWriter.println("Maze path (with positions) : " + this.getPath());
+            printWriter.print("Maze path (with values) : ");
+    
+            for (PathNode pathNode : this.getPath()) {
+                long currentValue = this.cube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];
+                printWriter.print(" " + currentValue);
+    
+                if (currentValue < minNode) {
+                    minNode = currentValue;
+                } else if (currentValue > maxNode) {
+                    maxNode = currentValue;
+                }
+    
+                pathLength++;
+    
+                if (!sumExceededMaxValue) {
+                    if ((pathSum + currentValue) > Long.MAX_VALUE) {
+                        pathSum = Long.MAX_VALUE;
+                        sumExceededMaxValue = true;
+                    } else {
+                        pathSum += currentValue;   
+                    }
+                }
+            }
+    
             printWriter.println();
-        }
-    
-        printWriter.println("Path for Maze " + cubes.size() + ": "+ maze.getPath());
-        printWriter.print("Path for Maze " + cubes.size() + " (values) : ");
-    
-        for (PathNode pathNode : maze.getPath()) {
-            printWriter.print(" " + auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()]);
-    
-            if (auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()] < minNode) {
-                minNode = auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];
-            } else if (auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()] > maxNode) {
-                maxNode = auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];
-            }
-            pathLength++;
-            if (sumExceededMaxValue == false) {
-                if ((pathSum + auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()]) > Long.MAX_VALUE) {
-                    pathSum = Long.MAX_VALUE;
-                    sumExceededMaxValue = true;
-                } else {
-                    pathSum += auxCube[pathNode.getX()][pathNode.getY()][pathNode.getZ()];   
-                }
+            printWriter.println("Minimum value from the path : " + minNode);
+            printWriter.println("Maximum value from the path : " + maxNode);
+            printWriter.println("Path Length : " + pathLength);
+            printWriter.println("Path Sum : " + pathSum);
+            if (sumExceededMaxValue) {
+                printWriter.println("\t\t\tSum exceeded Long.MAX_VALUE!");
             }
         }
-
-        printWriter.println();
-        printWriter.println("Minimum value from the path : " + minNode);
-        printWriter.println("Maximum value from the path : " + maxNode);
-        printWriter.println("Path Length : " + pathLength);
-        printWriter.println("Path Sum : " + pathSum);     if (sumExceededMaxValue) printWriter.println("\t\t\tSum exceded Long.MAX_VALUE!");
-        printWriter.println();
     }
-
-    public static ArrayList<String> getPaths() {
-        return paths;
-    }
-
-    public static long getMaxMazeSize() {
-        return maxMazeSize;
-    }
-
-    public static void main(String[] args) throws IOException {
-        String mazesFile = "mazes.txt";
-        String mazesPath = "paths.txt";
     
-        FileWriter fileWriter = new FileWriter(mazesPath);          // Create a FileWriter object to write to the file
-        PrintWriter printWriter = new PrintWriter(fileWriter);      // Create a PrintWriter object to write formatted text to the FileWriter
-
-        ArrayList<Maze> cubes = new ArrayList<>(1000000);
-        
-        try (Scanner scanner = new Scanner(new File(mazesFile))) {
-            while (true) {
-                Maze maze = createMaze(scanner);
-                if (maze == null) {
-                    break; // End of file reached
-                }
-                cubes.add(maze);
-
-                System.out.println(ANSI_YELLOW + "Path for Maze " + cubes.size() + ": " + ANSI_RESET + maze.getPath());
-                storeMazesInfo(cubes, maze, printWriter);
-            }
-            printWriter.close();
-            fileWriter.close();
-
-            System.out.println(ANSI_GREEN + "Successfully read " + cubes.size() + " maze(s) from the file and written to the file ~paths.txt~." + ANSI_RESET);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    
-        long maxSize = getMaxSize(cubes);
-        System.out.println("Max size of maze: " + maxSize);
-    }
-}
-
-final class Maze {
-    private final long[][][] cube;
-    private final int dimension;
-    private final ArrayList<PathNode> path;
-
-    public Maze(long[][][] cube, int dimension) {
-        this.cube = cube;
-        this.dimension = dimension;
-        this.path = generateRandomPath(this.dimension);
-    }
-
     private ArrayList<PathNode> generateRandomPath(int dimension) {
         ArrayList<PathNode> randomPath = new ArrayList<>();
         
@@ -262,6 +298,120 @@ final class Maze {
         return randomPath;
     }
     
+    private double storeMinReadingTime() {
+        double minTime = Double.MAX_VALUE;
+        for (double time : this.readingTimes) {
+            if (time < minTime) {
+                minTime = time;
+            }
+        }
+        return minTime;
+    }
+
+    private double storeMaxReadingTime() {
+        double maxTime = Double.MIN_VALUE;
+        for (double time : this.readingTimes) {
+            if (time > maxTime) {
+                maxTime = time;
+            }
+        }
+        return maxTime;
+    }
+
+    private double storeAvgReadingTime() {
+        double sum = 0;
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        for (double time : this.readingTimes) {
+            if (time < min) {
+                min = time;
+            }
+            if (time > max) {
+                max = time;
+            }
+            sum += time;
+        }
+        sum -= (min + max); // Subtract min and max from sum
+        return sum / (readingTimes.length - 2); // Exclude min and max from the count
+    }
+    
+    private double storeMinWritingTime() {
+        double minTime = Double.MAX_VALUE;
+        for (double time : this.writingTimes) {
+            if (time < minTime) {
+                minTime = time;
+            }
+        }
+        return minTime;
+    }
+    
+    private double storeMaxWritingTime() {
+        double maxTime = Double.MIN_VALUE;
+        for (double time : this.writingTimes) {
+            if (time > maxTime) {
+                maxTime = time;
+            }
+        }
+        return maxTime;
+    }
+
+    private double storeAvgWritingTime() {
+        double sum = 0;
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        for (double time : this.writingTimes) {
+            if (time < min) {
+                min = time;
+            }
+            if (time > max) {
+                max = time;
+            }
+            sum += time;
+        }
+        sum -= min + max; // Subtract min and max from sum
+        return sum / (writingTimes.length - 2); // Exclude min and max from the count
+    }
+
+    private long calculateBenchmarkReadScore(long dim) {
+        int readTimes;
+        switch ((int)dim) {
+            case 4, 8, 16, 32, 64:
+                readTimes = readTimesFor_4_8_16_32_64;
+                break;
+            case 128:
+                readTimes = readTimesFor_128;
+                break;
+            case 256:
+                readTimes = readTimesFor_256;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid maze dimension value: " + dim);
+        }
+    
+        double normalizedReadTime = getAvgReadTime() / readTimes;
+        double logFileLength = Math.log(getMazeFileLength() + 1); // Logarithmic scaling
+        double logDimension = Math.log(dim * dim * dim + 1); // Logarithmic scaling
+    
+        // Adjust weights and calculate benchmark score
+        double score = (normalizedReadTime * 0.2) + (logFileLength * 0.1) + (logDimension * 0.1);
+        return Math.round(score);
+    }     
+
+    private long calculateBenchmarkWriteScore() {
+        double normalizedWriteTime = getAvgWriteTime() / this.writeTimesForAll;
+        double logFileLength = Math.log(getMazeFileLength() + 1); // Logarithmic scaling
+        double logDimension = Math.log(getDimension() * getDimension() * getDimension() + 1); // Logarithmic scaling
+        double logWriteTimes = Math.log(writeTimesForAll + 1); // Logarithmic scaling
+    
+        // Adjust weights and calculate benchmark score
+        double score = (normalizedWriteTime * 0.2) + (logFileLength * 0.1) + (logDimension * 0.1) + (logWriteTimes * 0.1);
+        return Math.round(score);
+    }      
+
+    private long calculateOverallBenchmarkScore() {
+        return Math.round((this.readScore + this.writeScore) / 2);
+    }
+        
     public long[][][] getCube() {
         return cube;
     }
@@ -272,6 +422,77 @@ final class Maze {
 
     public ArrayList<PathNode> getPath() {
         return path;
+    }
+
+    public double getMinReadTime() {
+        return this.minReadTime;
+    }
+    
+    public double getMaxReadTime() {
+        return this.maxReadTime;
+    }
+    
+    public double getMinWriteTime() {
+        return this.minWriteTime;
+    }
+    
+    public double getMaxWriteTime() {
+        return this.maxWriteTime;
+    }
+    
+    public double getAvgReadTime() {
+        return this.avgReadTime;
+    }
+    
+    public double getAvgWriteTime() {
+        return this.avgWriteTime;
+    }
+
+    public long getReadScore() {
+        return this.readScore;
+    }
+    
+    public long getWriteScore() {
+        return this.writeScore;
+    }
+    
+    public long getOverallScore() {
+        return this.overallScore;
+    }
+
+    private long getMazeFileLength(int dim) {
+        String filePath;
+        switch (dim) {
+            case 4:
+                filePath = MazesFiles.getM4();
+                break;
+            case 8:
+                filePath = MazesFiles.getM8();
+                break;
+            case 16:
+                filePath = MazesFiles.getM16();
+                break;
+            case 32:
+                filePath = MazesFiles.getM32();
+                break;
+            case 64:
+                filePath = MazesFiles.getM64();
+                break;
+            case 128:
+                filePath = MazesFiles.getM128();
+                break;
+            case 256:
+                filePath = MazesFiles.getM256();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid maze dimension value: " + dim);
+        }
+        File file = new File(filePath);
+        return file.length();
+    }
+
+    public long getMazeFileLength() {
+        return mazeFileLength;
     }
 }
 
@@ -301,5 +522,51 @@ final class PathNode {
     @Override
     public String toString() {
         return "(" + x + ", " + y + ", " + z + ")";
+    }
+}
+
+final class MazesFiles {
+    private static final String basePath = "";
+
+    private static final String m4 = basePath + "maze4.txt";
+    private static final String m8 = basePath + "maze8.txt";
+    private static final String m16 = basePath + "maze16.txt";
+    private static final String m32 = basePath + "maze32.txt";
+    private static final String m64 = basePath + "maze64.txt";
+    private static final String m128 = basePath + "maze128.txt";
+    private static final String m256 = basePath + "maze256.txt";
+
+    private static final String mazePath = basePath + "path.txt";
+
+    public static String getM4() {
+        return MazesFiles.m4;
+    }
+
+    public static String getM8() {
+        return MazesFiles.m8;
+    }
+
+    public static String getM16() {
+        return MazesFiles.m16;
+    }
+
+    public static String getM32() {
+        return MazesFiles.m32;
+    }
+
+    public static String getM64() {
+        return MazesFiles.m64;
+    }
+
+    public static String getM128() {
+        return MazesFiles.m128;
+    }
+
+    public static String getM256() {
+        return MazesFiles.m256;
+    }
+
+    public static String getMazePath() {
+        return MazesFiles.mazePath;
     }
 }
