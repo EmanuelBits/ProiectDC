@@ -1,0 +1,76 @@
+12th Gen Intel(R) Core(TM) i5-1235U
+    Prime Value: 2                  Prime Value: 11                 Prime Value: 523                Prime Value: 1299709
+    Prime Index: 1                  Prime Index: 5                  Prime Index: 99                 Prime Index: 100000
+    Benchmark Score: 2243           Benchmark Score: 21479          Benchmark Score: 121897         Benchmark Score: 8000
+    Computation Time: 0.003 ms      Computation Time: 0.0119 ms     Computation Time: 0.053 ms      Computation Time: 118.9583 ms
+WDC PC SN540 SDDPNPF-512G-1032
+    Dimension : 4                               Dimension : 8                               Dimension : 16                              Dimension : 32                              Dimension : 64                              Dimension : 128                             Dimension : 256
+    Average Read Time: 1.0360642857142857 ms    Average Read Time: 2.4266428571428573 ms    Average Read Time: 6.056864285714285 ms     Average Read Time: 18.552242857142858 ms    Average Read Time: 104.56063571428572 ms    Average Read Time: 1024.3653666666667 ms    Average Read Time: 8788.082 ms
+    Average Write Time: 1.14446 ms              Average Write Time: 1.95772 ms              Average Write Time: 6.0164 ms               Average Write Time: 7.23342 ms              Average Write Time: 56.69604 ms             Average Write Time: 348.48452 ms            Average Write Time: 3833.51694 ms
+    Read Score: 12952                           Read Score: 30334                           Read Score: 75713                           Read Score: 231905                          Read Score: 1307011                         Read Score: 40974618                        Read Score: 439404104
+    Write Score: 32700                          Write Score: 55936                          Write Score: 171899                         Write Score: 206672                         Write Score: 1619890                        Write Score: 9956704                        Write Score: 109529059
+    Overall Score: 22826                        Overall Score: 43135                        Overall Score: 123806                       Overall Score: 219288                       Overall Score: 1463450                      Overall Score: 25465660                     Overall Score: 274466592
+
+Intel Core i7-10700 CPU @ 2.90Ghz
+    Prime Value: 2                  Prime Value: 11                 Prime Value: 523                Prime Value: 1299709
+    Prime Index: 1                  Prime Index: 5                  Prime Index: 99                 Prime Index: 100000
+    Benchmark Score: 2244           Benchmark Score: 21691          Benchmark Score: 122291         Benchmark Score: 2823
+    Computation Time: 0.0028 ms     Computation Time: 0.002 ms      Computation Time: 0.0496 ms     Computation Time: 338.8985 ms
+WDC PC SN730 SDBQNTY-512G-1001
+    Dimension : 4                              Dimension : 8                                Dimension : 16                             Dimension : 32                              Dimension : 64                               Dimension : 128                             Dimension : 256
+    Average Read Time: 0.8908785714285715 ms   Average Read Time: 1.5540642857142857 ms     Average Read Time: 4.743778571428572 ms    Average Read Time: 19.396642857142858 ms    Average Read Time: 133.51665714285716 ms     Average Read Time: 1200.0023333333334 ms    Average Read Time: 10042.43955 ms
+    Average Write Time: 0.82346 ms             Average Write Time: 0.77086 ms               Average Write Time: 4.82402 ms             Average Write Time: 11.25522 ms             Average Write Time: 53.07856 ms              Average Write Time: 482.38922 ms            Average Write Time: 3072.8886 ms
+    Read Score: 11137                          Read Score: 19427                            Read Score: 59299                          Read Score: 242460                          Read Score: 1668961                          Read Score: 48000096                        Read Score: 502121981
+    Write Score: 23529                         Write Score: 22026                           Write Score: 137831                        Write Score: 321580                         Write Score: 1516533                         Write Score: 13782553                       Write Score: 87796821
+    Overall Score: 17333                       Overall Score: 20726                         Overall Score: 98565                       Overall Score: 282020                       Overall Score: 1592747                       Overall Score: 30891324                     Overall Score: 294959392
+
+AMD Ryzen 7 5800H with Radeon Graphics
+    Prime Value: 2                  Prime Value: 11                 Prime Value: 523                Prime Value: 1299709
+    Prime Index: 1                  Prime Index: 5                  Prime Index: 99                 Prime Index: 100000
+    Benchmark Score: 2244           Benchmark Score: 21687          Benchmark Score: 121573         Benchmark Score: 10555
+    Computation Time: 0.0028 ms     Computation Time: 0.0022 ms     Computation Time: 0.0558 ms     Computation Time: 89.922 ms
+SKHynix_HFS001TDE9X084N
+    Dimension : 4                           Dimension : 8                           Dimension : 16                          Dimension : 32                          Dimension : 64                          Dimension : 128                         Dimension : 256
+    Average Read Time: 1.1139714285714286   Average Read Time: 3.3189214285714286   Average Read Time: 3.777314285714286    Average Read Time: 20.408707142857143   Average Read Time: 123.33308571428572   Average Read Time: 1047.1965333333333   Average Read Time: 9633.8899
+    Average Write Time: 1.2031              Average Write Time: 1.40774             Average Write Time: 5.08882             Average Write Time: 12.56154            Average Write Time: 56.87406            Average Write Time: 597.11472           Average Write Time: 6239.53634
+    Read Score: 13926                       Read Score: 41488                       Read Score: 47218                       Read Score: 255111                      Read Score: 1541666                     Read Score: 41887864                    Read Score: 481694499
+    Write Score: 34375                      Write Score: 40223                      Write Score: 145397                     Write Score: 358904                     Write Score: 1624976                    Write Score: 17060424                   Write Score: 178272471
+    Overall Score: 24150                    Overall Score: 40855                    Overall Score: 96307                    Overall Score: 307007                   Overall Score: 1583321                  Overall Score: 29474144                 Overall Score: 329983488
+
+AMD Ryzen 7 5800
+    Prime Value: 2                  Prime Value: 11                 Prime Value: 523                Prime Value: 1299709        
+    Prime Index: 1                  Prime Index: 5                  Prime Index: 99                 Prime Index: 100000
+    Benchmark Score: 2243           Benchmark Score: 21680          Benchmark Score: 121562         Benchmark Score: 11917      
+    Computation Time: 0.0031 ms     Computation Time: 0.0025 ms     Computation Time: 0.0559 ms     Computation Time: 79.5283 ms
+SAMSUNG MZVL2512HCJQ-00BL7
+    Dimension : 4                           Dimension : 8                           Dimension : 16                          Dimension : 32                          Dimension : 64                          Dimension : 128                         Dimension : 256
+    Average Read Time: 0.8117142857142857   Average Read Time: 0.9517142857142857   Average Read Time: 2.495578571428571    Average Read Time: 14.873464285714286   Average Read Time: 95.15133571428572    Average Read Time: 769.1871             Average Read Time: 6488.6152
+    Average Write Time: 0.66706             Average Write Time: 0.97296             Average Write Time: 4.11184             Average Write Time: 8.2458              Average Write Time: 31.10518            Average Write Time: 409.2928            Average Write Time: 2505.07388
+    Read Score: 10147                       Read Score: 11898                       Read Score: 31197                       Read Score: 185921                      Read Score: 1189394                     Read Score: 30767487                    Read Score: 324430764
+    Write Score: 19060                      Write Score: 27800                      Write Score: 117483                     Write Score: 235597                     Write Score: 888722                     Write Score: 11694083                   Write Score: 71573543
+    Overall Score: 14603                    Overall Score: 19849                    Overall Score: 74340                    Overall Score: 210759                   Overall Score: 1039058                  Overall Score: 21230784                 Overall Score: 198002160
+
+Intel Core i7-3630QM
+    Prime Value: 2                  Prime Value: 11                 Prime Value: 523                Prime Value: 1299709
+    Prime Index: 1                  Prime Index: 5                  Prime Index: 99                 Prime Index: 100000
+    Benchmark Score: 2236           Benchmark Score: 21658          Benchmark Score: 114943         Benchmark Score: 1839        
+    Computation Time: 0.0064 ms     Computation Time: 0.0035 ms     Computation Time: 0.1167 ms     Computation Time: 520.7657 ms
+KINGSTON SV300S37A120G
+    Dimension : 4                           Dimension : 8                           Dimension : 16                          Dimension : 32                          Dimension : 64                          Dimension : 128                         Dimension : 256
+    Average Read Time: 1.9479214285714286   Average Read Time: 2.3075571428571426   Average Read Time: 5.943378571428572    Average Read Time: 29.032964285714286   Average Read Time: 187.7213142857143    Average Read Time: 1689.4517            Average Read Time: 14308.3915
+    Average Write Time: 1.98508             Average Write Time: 2.7059              Average Write Time: 8.88506             Average Write Time: 17.95406            Average Write Time: 89.39748            Average Write Time: 564.1074            Average Write Time: 6427.68226
+    Read Score: 24350                       Read Score: 28846                       Read Score: 74294                       Read Score: 362914                      Read Score: 2346519                     Read Score: 67578071                    Read Score: 715419579
+    Write Score: 56718                      Write Score: 77313                      Write Score: 253861                     Write Score: 512976                     Write Score: 2554217                    Write Score: 16117358                   Write Score: 183648068
+    Overall Score: 40534                    Overall Score: 53079                    Overall Score: 164077                   Overall Score: 437945                   Overall Score: 2450368                  Overall Score: 41847712                 Overall Score: 449533824
+
+Qualcomm Snapdragon 8 Gen 1 (Android)
+    Prime Value: 2                  Prime Value: 11                 Prime Value: 523                Prime Value: 1299709
+    Prime Index: 1                  Prime Index: 5                  Prime Index: 99                 Prime Index: 100000
+    Benchmark Score: 2244           Benchmark Score: 21685          Benchmark Score: 119645         Benchmark Score: 5438
+    Computation Time: 0.002865 ms   Computation Time: 0.002292 ms   Computation Time: 0.072812 ms   Computation Time: 175.483281 ms
+UFS
+    Dimension : 4                           Dimension : 8                      Dimension : 16                          Dimension : 32                          Dimension : 64                          Dimension : 128                         Dimension : 256
+    Average Read Time: 1.4281509285714287   Average Read Time: 2.7257665       Average Read Time: 5.6492857857142855   Average Read Time: 24.342842214285714   Average Read Time: 144.0539097857143    Average Read Time: 1357.3963013333332   Average Read Time: 12307.7331205
+    Average Write Time: 1.5594274           Average Write Time: 1.2054064      Average Write Time: 6.1336455999999995  Average Write Time: 12.922552           Average Write Time: 53.743281200000006  Average Write Time: 582.6569686         Average Write Time: 5165.2702998
+    Read Score: 17853                       Read Score: 34073                  Read Score: 70618                       Read Score: 304288                      Read Score: 1800677                     Read Score: 54295855                    Read Score: 615386660
+    Write Score: 44556                      Write Score: 34442                 Write Score: 175249                     Write Score: 369218                     Write Score: 1535525                    Write Score: 16647345                   Write Score: 147579155
